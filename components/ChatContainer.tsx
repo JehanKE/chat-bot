@@ -31,7 +31,7 @@ export const ChatContainer = ({ session, user: userProp }: ChatContainerProps = 
   const [sessions, setSessions] = useState<ChatSession[]>(INITIAL_SESSIONS);
   const [activeSessionId, setActiveSessionId] = useState<string>(INITIAL_SESSIONS[0].id);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [currentModel, setCurrentModel] = useState('gpt-4o');
+  const [currentModel, setCurrentModel] = useState('gemini-3.8-flash');
   const [input, setInput] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(true);

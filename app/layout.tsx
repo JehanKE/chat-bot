@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "ChatGPT - Modern AI Chat",
-  description: "ChatGPT-style AI chatbot user interface built with Next.js and Tailwind CSS",
+  title: "AI Chat - Modern Assistant",
+  description: "Modern AI chatbot user interface built with Next.js and Tailwind CSS",
 };
 
 const RootLayout = ({

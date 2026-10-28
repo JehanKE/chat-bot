@@ -29,9 +29,9 @@ async function buildCSS() {
   const candidates = scanner.scan();
   let builtCss = compiler.build([...candidates]);
 
-  // Append ChatGPT custom theme & scrollbars
+  // Append AI Chat custom theme & scrollbars
   const customStyles = `
-/* ChatGPT Custom Styles & Scrollbars */
+/* AI Chat Custom Styles & Scrollbars */
 :root {
   --background: #ffffff;
   --foreground: #0d0d0d;

@@ -5,7 +5,7 @@ interface IconProps extends React.SVGProps<SVGSVGElement> {
   className?: string;
 }
 
-export const OpenAIIcon = ({ size = 20, className = '', ...props }: IconProps) => (
+export const BotAIIcon = ({ size = 20, className = '', ...props }: IconProps) => (
   <svg
     width={size}
     height={size}

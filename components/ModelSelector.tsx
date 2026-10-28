@@ -6,24 +6,17 @@ import { AIModel } from '../types/chat';
 
 export const AVAILABLE_MODELS: AIModel[] = [
   {
-    id: 'gpt-4o',
-    name: 'ChatGPT-4o',
-    badge: 'Smartest',
-    description: 'Great for most tasks, reasoning, and coding',
+    id: 'gemini-3.8-flash',
+    name: 'Gemini 3.8 Flash',
+    badge: 'Fast & Smart',
+    description: 'High-speed reasoning, coding, and general tasks',
     isPopular: true,
   },
   {
-    id: 'gpt-4o-mini',
-    name: 'ChatGPT-4o mini',
+    id: 'gemini-3.8-flash-lite',
+    name: 'Gemini 3.8 Flash Lite',
     badge: 'Fastest',
-    description: 'Everyday tasks and quick answers with high speed',
-  },
-  {
-    id: 'o3-mini',
-    name: 'o3-mini',
-    badge: 'Reasoning',
-    description: 'Advanced STEM reasoning and deep math calculations',
-    isNew: true,
+    description: 'Everyday tasks and quick answers with minimal latency',
   },
 ];
 
