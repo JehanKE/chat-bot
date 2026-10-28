@@ -7,10 +7,6 @@ import {
   SparklesIcon,
   CopyIcon,
   CheckIcon,
-  ThumbsUpIcon,
-  ThumbsDownIcon,
-  RefreshIcon,
-  VolumeIcon,
   PaperclipIcon,
 } from './icons';
 
@@ -22,11 +18,8 @@ interface MessageItemProps {
 
 export const MessageItem = ({
   message,
-  onRegenerate,
-  onFeedback,
 }: MessageItemProps) => {
   const [copied, setCopied] = useState(false);
-  const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const isUser = message.role === 'user';
 
   const handleCopy = async () => {
@@ -36,13 +29,6 @@ export const MessageItem = ({
       setTimeout(() => setCopied(false), 2000);
     } catch {
       // Fallback
-    }
-  };
-
-  const toggleAudio = () => {
-    setIsPlayingAudio(!isPlayingAudio);
-    if (!isPlayingAudio) {
-      setTimeout(() => setIsPlayingAudio(false), 3000);
     }
   };
 
@@ -107,56 +93,6 @@ export const MessageItem = ({
                 ) : (
                   <CopyIcon size={14} />
                 )}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => onFeedback?.(message.id, 'like')}
-                className={`flex h-7 w-7 items-center justify-center rounded-md transition-colors ${
-                  message.feedback === 'like'
-                    ? 'text-emerald-500 bg-emerald-500/10'
-                    : 'text-zinc-500 hover:text-zinc-900 hover:bg-black/5 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-white/10'
-                }`}
-                title="Good response"
-              >
-                <ThumbsUpIcon size={14} />
-              </button>
-
-              <button
-                type="button"
-                onClick={() => onFeedback?.(message.id, 'dislike')}
-                className={`flex h-7 w-7 items-center justify-center rounded-md transition-colors ${
-                  message.feedback === 'dislike'
-                    ? 'text-red-500 bg-red-500/10'
-                    : 'text-zinc-500 hover:text-zinc-900 hover:bg-black/5 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-white/10'
-                }`}
-                title="Bad response"
-              >
-                <ThumbsDownIcon size={14} />
-              </button>
-
-              {onRegenerate && (
-                <button
-                  type="button"
-                  onClick={onRegenerate}
-                  className="flex h-7 w-7 items-center justify-center rounded-md text-zinc-500 hover:text-zinc-900 hover:bg-black/5 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-white/10 transition-colors"
-                  title="Regenerate response"
-                >
-                  <RefreshIcon size={14} />
-                </button>
-              )}
-
-              <button
-                type="button"
-                onClick={toggleAudio}
-                className={`flex h-7 w-7 items-center justify-center rounded-md transition-colors ${
-                  isPlayingAudio
-                    ? 'text-blue-500 bg-blue-500/10'
-                    : 'text-zinc-500 hover:text-zinc-900 hover:bg-black/5 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-white/10'
-                }`}
-                title={isPlayingAudio ? 'Playing...' : 'Read aloud'}
-              >
-                <VolumeIcon size={14} />
               </button>
             </div>
           )}

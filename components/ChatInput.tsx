@@ -5,8 +5,6 @@ import {
   SendIcon,
   StopIcon,
   PlusIcon,
-  GlobeIcon,
-  MicIcon,
   CloseIcon,
   PaperclipIcon,
 } from './icons';
@@ -33,7 +31,6 @@ export const ChatInput = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [attachments, setAttachments] = useState<ChatAttachment[]>([]);
   const [webSearchEnabled, setWebSearchEnabled] = useState(false);
-  const [isRecording, setIsRecording] = useState(false);
 
   // Auto-resize textarea height
   useEffect(() => {
@@ -148,22 +145,8 @@ export const ChatInput = ({
             </button>
           </div>
 
-          {/* Right side actions (Mic, Send/Stop) */}
+          {/* Right side actions (Send/Stop) */}
           <div className="flex items-center gap-2">
-            {/* Mic button */}
-            <button
-              type="button"
-              onClick={() => setIsRecording(!isRecording)}
-              className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors ${
-                isRecording
-                  ? 'bg-red-500/20 text-red-500 dark:text-red-400 animate-pulse'
-                  : 'text-zinc-500 hover:text-black hover:bg-black/10 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-white/10'
-              }`}
-              title={isRecording ? 'Listening...' : 'Voice input'}
-            >
-              <MicIcon size={17} />
-            </button>
-
             {/* Send / Stop button */}
             {isStreaming ? (
               <button
@@ -179,11 +162,10 @@ export const ChatInput = ({
                 type="button"
                 onClick={handleSend}
                 disabled={!hasContent || disabled}
-                className={`flex h-8 w-8 items-center justify-center rounded-full transition-all duration-200 active:scale-95 ${
-                  hasContent && !disabled
-                    ? 'bg-black text-white hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200 shadow-md cursor-pointer'
-                    : 'bg-black/10 text-zinc-400 dark:bg-white/10 dark:text-zinc-500 cursor-not-allowed'
-                }`}
+                className={`flex h-8 w-8 items-center justify-center rounded-full transition-all duration-200 active:scale-95 ${hasContent && !disabled
+                  ? 'bg-black text-white hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200 shadow-md cursor-pointer'
+                  : 'bg-black/10 text-zinc-400 dark:bg-white/10 dark:text-zinc-500 cursor-not-allowed'
+                  }`}
                 title="Send message"
               >
                 <SendIcon size={16} />
