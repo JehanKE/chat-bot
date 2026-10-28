@@ -30,6 +30,8 @@ interface SidebarProps {
   isDarkMode: boolean;
   onToggleTheme: () => void;
   user?: AuthUser | null;
+  queriesUsed?: number;
+  queriesLimit?: number;
 }
 
 export const Sidebar = ({
@@ -44,6 +46,8 @@ export const Sidebar = ({
   isDarkMode,
   onToggleTheme,
   user,
+  queriesUsed,
+  queriesLimit = 5,
 }: SidebarProps) => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
@@ -313,6 +317,14 @@ export const Sidebar = ({
                       </div>
                     </div>
 
+                    {/* Prompt Usage Info */}
+                    <div className="flex items-center justify-between px-3 py-2 text-[11px] text-zinc-500 dark:text-zinc-400 border-b border-black/5 dark:border-white/5">
+                      <span>Free prompts used</span>
+                      <span className="font-semibold text-zinc-800 dark:text-zinc-200">
+                        {queriesUsed ?? 0} / {queriesLimit}
+                      </span>
+                    </div>
+
                     {/* Popover Actions */}
                     <div className="pt-1 space-y-0.5">
                       {/* Theme Switcher inside Profile Menu */}
@@ -370,6 +382,11 @@ export const Sidebar = ({
                         <span className="text-xs font-medium text-zinc-800 dark:text-white truncate">
                           {user.name || user.email || 'User'}
                         </span>
+                        {queriesUsed !== undefined && (
+                          <span className="text-[10px] text-zinc-500 dark:text-zinc-400">
+                            {queriesUsed} / {queriesLimit} prompts
+                          </span>
+                        )}
                       </div>
                     </div>
 

@@ -1,6 +1,8 @@
 'use server';
 
 import { GoogleGenAI } from '@google/genai';
+import { auth } from '@/auth.config';
+import { checkAndIncrementQuery, getUserUsage } from '@/lib/db';
 
 export interface ChatHistoryItem {
   role: 'user' | 'assistant' | 'system';
@@ -11,6 +13,8 @@ export interface AskAIResult {
   success: boolean;
   text?: string;
   error?: string;
+  queriesUsed?: number;
+  queriesLimit?: number;
 }
 
 export const askAI = async (
@@ -18,19 +22,43 @@ export const askAI = async (
   history: ChatHistoryItem[] = []
 ): Promise<AskAIResult> => {
   try {
+    // 1. Verify user is logged in
+    const session = await auth();
+    const userEmail = session?.user?.email;
+
+    if (!userEmail) {
+      return {
+        success: false,
+        error: 'Please sign in to send messages.',
+      };
+    }
+
+    // 2. Check and enforce 5 prompt limit in Neon database
+    const usage = await checkAndIncrementQuery(userEmail, 5);
+    if (!usage.allowed) {
+      return {
+        success: false,
+        error: usage.error || 'You have reached your limit of 5 prompts.',
+        queriesUsed: usage.queriesUsed,
+        queriesLimit: usage.queriesLimit,
+      };
+    }
+
+    // 3. Check Gemini API key
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
       return {
         success: false,
         error:
-          'GEMINI_API_KEY is not configured. Please get a free API key from https://aistudio.google.com/ and set GEMINI_API_KEY=your_key in your .env file.',
+          'GEMINI_API_KEY is not configured. Please set GEMINI_API_KEY in your .env file.',
+        queriesUsed: usage.queriesUsed,
+        queriesLimit: usage.queriesLimit,
       };
     }
 
     const ai = new GoogleGenAI({ apiKey });
     const model = 'gemini-3.8-flash';
 
-    // Disable extended thinking budget so Gemini generates responses with near-zero latency
     const config = {
       thinkingConfig: {
         thinkingBudget: 0,
@@ -60,6 +88,8 @@ export const askAI = async (
       return {
         success: true,
         text: response.text || 'No response generated.',
+        queriesUsed: usage.queriesUsed,
+        queriesLimit: usage.queriesLimit,
       };
     }
 
@@ -73,12 +103,25 @@ export const askAI = async (
     return {
       success: true,
       text: response.text || 'No response generated.',
+      queriesUsed: usage.queriesUsed,
+      queriesLimit: usage.queriesLimit,
     };
   } catch (error: any) {
-    console.error('Gemini API Error:', error);
+    console.error('API Error in askAI:', error);
     return {
       success: false,
-      error: error?.message || 'Failed to fetch response from Gemini.',
+      error: error?.message || 'Failed to fetch response.',
     };
   }
+};
+
+/**
+ * Fetch current user prompt usage from Neon database
+ */
+export const getUserUsageAction = async () => {
+  const session = await auth();
+  if (!session?.user?.email) {
+    return null;
+  }
+  return await getUserUsage(session.user.email, 5);
 };

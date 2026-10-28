@@ -5,7 +5,8 @@ import { ChatSession, Message, ChatAttachment, AuthUser } from '../types/chat';
 import { Sidebar } from './Sidebar';
 import { MessageList } from './MessageList';
 import { ChatInput } from './ChatInput';
-import { askAI } from '@/app/actions/chat';
+import { askAI, getUserUsageAction } from '@/app/actions/chat';
+import { loginWithGoogle } from '@/app/actions/auth';
 
 const INITIAL_SESSIONS: ChatSession[] = [
   {
@@ -34,6 +35,23 @@ export const ChatContainer = ({ session, user: userProp }: ChatContainerProps = 
   const [input, setInput] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(true);
+  const [queryUsage, setQueryUsage] = useState<{
+    used: number;
+    limit: number;
+  } | null>(null);
+
+  // Sync user prompt usage from Neon database
+  useEffect(() => {
+    if (user?.email) {
+      getUserUsageAction().then((usage) => {
+        if (usage) {
+          setQueryUsage({ used: usage.queriesUsed, limit: usage.queriesLimit });
+        }
+      });
+    } else {
+      setQueryUsage(null);
+    }
+  }, [user?.email]);
 
   // Ref to abort streaming
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -128,6 +146,15 @@ export const ChatContainer = ({ session, user: userProp }: ChatContainerProps = 
    * replace the `streamMockResponse(...)` call below with your fetch logic!
    */
   const handleSendMessage = async (content: string, attachments?: ChatAttachment[]) => {
+    if (!user) {
+      loginWithGoogle();
+      return;
+    }
+
+    if (queryUsage && queryUsage.used >= queryUsage.limit) {
+      return;
+    }
+
     if ((!content && (!attachments || attachments.length === 0)) || isStreaming) return;
 
     const userMessageId = `user-${Date.now()}`;
@@ -179,6 +206,13 @@ export const ChatContainer = ({ session, user: userProp }: ChatContainerProps = 
       }));
 
       const res = await askAI(content, history);
+
+      if (res.queriesUsed !== undefined) {
+        setQueryUsage({
+          used: res.queriesUsed,
+          limit: res.queriesLimit ?? 5,
+        });
+      }
 
       if (controller.signal.aborted) {
         setIsStreaming(false);
@@ -299,6 +333,8 @@ export const ChatContainer = ({ session, user: userProp }: ChatContainerProps = 
         isDarkMode={isDarkMode}
         onToggleTheme={toggleTheme}
         user={user}
+        queriesUsed={queryUsage?.used}
+        queriesLimit={queryUsage?.limit ?? 5}
       />
 
       {/* Main Conversation Column */}
@@ -326,6 +362,10 @@ export const ChatContainer = ({ session, user: userProp }: ChatContainerProps = 
             onSend={handleSendMessage}
             onStop={handleStopStreaming}
             isStreaming={isStreaming}
+            isLoggedIn={!!user}
+            queriesUsed={queryUsage?.used}
+            queriesLimit={queryUsage?.limit ?? 5}
+            onSignIn={loginWithGoogle}
           />
         </div>
       </main>
